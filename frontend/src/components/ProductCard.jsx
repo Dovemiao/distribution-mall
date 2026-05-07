@@ -1,83 +1,95 @@
 import { Link } from 'react-router-dom'
-import { useCartStore } from '../stores/cartStore'
+import { Heart, Share2 } from 'lucide-react'
+import { useState } from 'react'
 
-export default function ProductCard({ product }) {
-  const addToCart = useCartStore(state => state.addItem)
+function ProductCard({ product }) {
+  const [liked, setLiked] = useState(false)
 
-  const handleAddCart = () => {
-    addToCart(product)
-    alert('已添加到购物车')
+  const formatPrice = (price) => {
+    return `¥${parseFloat(price).toFixed(2)}`
+  }
+
+  const handleShare = (e) => {
+    e.preventDefault()
+    const text = `${product.name} - ${formatPrice(product.price)} - 分销商城推荐`
+    if (navigator.share) {
+      navigator.share({
+        title: product.name,
+        text: text,
+        url: window.location.href
+      })
+    } else {
+      alert(`分享链接: ${product.affiliateLink}`)
+    }
   }
 
   return (
-    <div className="bg-white rounded-lg overflow-hidden hover:shadow-lg transition">
-      {/* Image */}
-      <Link to={`/product/${product.id}`} className="block overflow-hidden bg-gray-100 h-48">
-        <img
-          src={product.image}
-          alt={product.name}
-          className="w-full h-full object-cover hover:scale-105 transition"
-        />
-      </Link>
-
-      {/* Content */}
-      <div className="p-4">
-        {/* Tags */}
-        <div className="flex gap-2 mb-2">
-          {product.tag === 'taobao' && (
-            <span className="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded">淘宝</span>
+    <Link to={`/product/${product.id}`}>
+      <div className="bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+        {/* 商品图片 */}
+        <div className="relative bg-gray-200 aspect-square overflow-hidden group">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform"
+          />
+          {product.discount && (
+            <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-sm font-bold">
+              {product.discount}
+            </div>
           )}
-          {product.tag === 'pinduoduo' && (
-            <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">拼多多</span>
+          {product.badge && (
+            <div className="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded text-xs">
+              {product.badge}
+            </div>
           )}
-        </div>
-
-        {/* Title */}
-        <Link
-          to={`/product/${product.id}`}
-          className="block text-sm font-semibold text-gray-800 mb-2 line-clamp-2 hover:text-red-500"
-        >
-          {product.name}
-        </Link>
-
-        {/* Rating */}
-        <div className="flex items-center gap-1 text-xs text-gray-600 mb-2">
-          <span>⭐ {product.rating}</span>
-          <span className="text-gray-400">({product.reviews}条评价)</span>
-        </div>
-
-        {/* Price */}
-        <div className="mb-3">
-          <div className="text-xl font-bold text-red-500">
-            ¥{product.price}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex justify-between text-white">
+              <button
+                onClick={(e) => {
+                  e.preventDefault()
+                  setLiked(!liked)
+                }}
+                className="hover:scale-110 transition-transform"
+              >
+                <Heart size={20} fill={liked ? 'currentColor' : 'none'} />
+              </button>
+              <button
+                onClick={handleShare}
+                className="hover:scale-110 transition-transform"
+              >
+                <Share2 size={20} />
+              </button>
+            </div>
           </div>
-          {product.originalPrice && (
-            <div className="text-xs text-gray-500 line-through">
-              ¥{product.originalPrice}
+        </div>
+
+        {/* 商品信息 */}
+        <div className="p-3">
+          <p className="text-sm text-gray-700 line-clamp-2 mb-2 hover:text-red-500">
+            {product.name}
+          </p>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-red-500 font-bold text-lg">{formatPrice(product.price)}</span>
+            {product.originalPrice && (
+              <span className="text-gray-500 line-through text-sm">{formatPrice(product.originalPrice)}</span>
+            )}
+          </div>
+          <div className="flex items-center text-xs text-gray-600">
+            <span className="flex items-center">
+              ⭐ {product.rating || 4.8}
+            </span>
+            <span className="ml-2">{product.sales || 0}人付款</span>
+          </div>
+          {product.affiliateSource && (
+            <div className="mt-2 text-xs text-gray-500">
+              来自: {product.affiliateSource}
             </div>
           )}
         </div>
-
-        {/* Buttons */}
-        <div className="space-y-2">
-          {product.affiliateLink && (
-            <a
-              href={product.affiliateLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block text-center py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition"
-            >
-              🔗 去购买
-            </a>
-          )}
-          <button
-            onClick={handleAddCart}
-            className="w-full py-2 bg-gray-100 text-gray-800 text-sm rounded hover:bg-gray-200 transition"
-          >
-            加入购物车
-          </button>
-        </div>
       </div>
-    </div>
+    </Link>
   )
 }
+
+export default ProductCard

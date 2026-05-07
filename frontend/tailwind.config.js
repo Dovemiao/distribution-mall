@@ -7,11 +7,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#FF6B6B',
-        secondary: '#f5f5f5',
-      },
-      fontFamily: {
-        sans: ['PingFang SC', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        primary: '#ff6b6b',
+        secondary: '#f7931e',
       },
     },
   },
