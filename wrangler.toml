@@ -1,0 +1,29 @@
+name = "distribution-mall"
+type = "service"
+account_id = "your_account_id"
+workers_dev = true
+route = ""
+zone_id = ""
+
+[[build.upload]]
+format = "modules"
+main = "./src/index.js"
+
+[[build.upload.rules]]
+type = "CompiledContentType"
+globs = ["**/*.wasm"]
+fallthrough = true
+
+[env.production]
+environ_vars = { ENVIRONMENT = "production" }
+
+[env.development]
+environ_vars = { ENVIRONMENT = "development" }
+
+[[d1_databases]]
+binding = "DB"
+database_name = "distribution_mall"
+database_id = ""
+
+[vars]
+API_BASE_URL = "https://api.example.com"
